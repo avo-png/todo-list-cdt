@@ -5,15 +5,11 @@ function TodoList() {
 		{ id: 3, title: "clean garage" },
 	];
 	return (
-		<div>
-			{
-				<ul>
-					{todoList.map((todo) => (
-						<li key={todo.id}>{todo.title}</li>
-					))}
-				</ul>
-			}
-		</div>
+		<ul>
+			{todoList.map((todo) => (
+				<li key={todo.id}>{todo.title}</li>
+			))}
+		</ul>
 	);
 }
 
