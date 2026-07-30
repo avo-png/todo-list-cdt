@@ -27,6 +27,7 @@ function App() {
 			<div>
 				<h1>Todo List</h1>
 				<TodoForm />
+				<TodoForm onAddTodo={addTodo} />
 				<TodoList todoList={todoList} />
 			</div>
 		</>
