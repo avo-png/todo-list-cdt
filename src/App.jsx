@@ -3,11 +3,11 @@ import TodoForm from "./features/TodoList/TodoForm";
 import TodoList from "./features/TodoList/TodoList";
 import { useState } from "react";
 
-const todos = [
+// const todos = [
 	// { id: 1, title: "review resources" },
 	// { id: 2, title: "take notes" },
 	// { id: 3, title: "code out app" },
-];
+// ];
 
 function App() {
 	const [todoList, setTodoList] = useState([]);
@@ -33,12 +33,22 @@ function App() {
 		);
 	}
 
+	function updateTodo(editedTodo) {
+		const updatedTodos = todoList.map((todo) => {
+			if (todo.id === editedTodo.id) {
+				return {... editedTodo}
+			}
+			return todo;
+		})
+		setTodoList(updatedTodos)
+	}
+
 	return (
 		<>
 			<div>
 				<h1>Todo List</h1>
 				<TodoForm onAddTodo={addTodo} />
-				<TodoList todoList={todoList} onCompleteTodo={completeTodo}/>
+				<TodoList todoList={todoList} onCompleteTodo={completeTodo} onUpdateTodo={updateTodo}/>
 			</div>
 		</>
 	);
