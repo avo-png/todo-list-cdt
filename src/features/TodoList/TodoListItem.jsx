@@ -1,10 +1,20 @@
 import { useState } from "react";
 import TextInputWithLabel from "../../shared/TextInputWithLabel";
 import { isValidTodoTitle } from "../../utils/todoValidation";
+import { useEditableTitle } from "../../hooks/useEditableTitle";
 
 function TodoListItem({ todo, onCompleteTodo, onUpdateTodo }) {
-	const [isEditing, setIsEditing] = useState(false);
-	const [workingTitle, setWorkingTitle] = useState(todo.title);
+	// const [isEditing, setIsEditing] = useState(false);
+	// const [workingTitle, setWorkingTitle] = useState(todo.title);
+	const {
+		isEditing,
+		workingTitle,
+		startEditing,
+		cancelEdit,
+		updateTitle,
+		finishEdit,
+	} = useEditableTitle(todo.title);
+
 	const handleCancel = () => {
 		setWorkingTitle(todo.title);
 		setIsEditing(false);
