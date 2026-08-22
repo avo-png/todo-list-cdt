@@ -1,6 +1,7 @@
 import "./App.css";
 import TodosPage from "./features/Todos/TodosPage";
 import Header from "./shared/Header";
+import Logon from "./features/Logon";
 
 function App() {
 	
@@ -8,6 +9,7 @@ function App() {
 		<>
 			<Header />
 			<TodosPage />
+			<Logon />
 		</>
 	);
 }
