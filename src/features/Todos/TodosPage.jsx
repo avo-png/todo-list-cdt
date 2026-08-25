@@ -5,6 +5,8 @@ import TodoList from "./TodoList/TodoList";
 function TodosPage({ token }) {
 	const [todoList, setTodoList] = useState([]);
 	const [error, setError] = useState("");
+	const [sortBy, setSortBy] = useState("createdAt");
+	const [sortDirection, setSortDirection] = useState("desc");
 	const [isTodoListLoading, setIsTodoListLoading] = useState(false);
 
 	useEffect(() => {
@@ -13,7 +15,13 @@ function TodosPage({ token }) {
 			setError("");
 
 			try {
-				const response = await fetch("/api/tasks?limit=100", {
+				const params = new URLSearchParams({
+					sortBy,
+					sortDirection,
+					limit: 100,
+				});
+
+				const response = await fetch(`/api/tasks?${params}`, {
 					method: "GET",
 					headers: {
 						"X-CSRF-TOKEN": token,
@@ -41,7 +49,7 @@ function TodosPage({ token }) {
 		if (token) {
 			fetchTodos();
 		}
-	}, [token]);
+	}, [token, sortBy, sortDirection]);
 
 	async function addTodo(todoTitle) {
 		const newTodo = {
