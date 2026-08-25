@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import TodoForm from "./TodoForm";
 import TodoList from "./TodoList/TodoList";
+import SortBy from "../../shared/SortBy";
+import useDebounce from "../../utils/useDebounce";
+import FilterInput from "../../shared/FilterInput";
 
 function TodosPage({ token }) {
 	const [todoList, setTodoList] = useState([]);
@@ -8,6 +11,11 @@ function TodosPage({ token }) {
 	const [sortBy, setSortBy] = useState("createdAt");
 	const [sortDirection, setSortDirection] = useState("desc");
 	const [isTodoListLoading, setIsTodoListLoading] = useState(false);
+	const [filterTerm, setFilterTerm] = useState("");
+	const debouncedFilterTerm = useDebounce(filterTerm, 300);
+	const handleFilterChange = (newTerm) => {
+		setFilterTerm(newTerm);
+	};
 
 	useEffect(() => {
 		async function fetchTodos() {
@@ -15,11 +23,17 @@ function TodosPage({ token }) {
 			setError("");
 
 			try {
-				const params = new URLSearchParams({
+				const paramsObject = {
 					sortBy,
 					sortDirection,
 					limit: 100,
-				});
+				};
+
+				if (debouncedFilterTerm) {
+					paramsObject.find = debouncedFilterTerm;
+				}
+
+				const params = new URLSearchParams(paramsObject);
 
 				const response = await fetch(`/api/tasks?${params}`, {
 					method: "GET",
@@ -49,7 +63,7 @@ function TodosPage({ token }) {
 		if (token) {
 			fetchTodos();
 		}
-	}, [token, sortBy, sortDirection]);
+	}, [token, sortBy, sortDirection, debouncedFilterTerm]);
 
 	async function addTodo(todoTitle) {
 		const newTodo = {
@@ -126,6 +140,18 @@ function TodosPage({ token }) {
 			)}
 
 			{isTodoListLoading && <p>Loading todos...</p>}
+
+			<SortBy
+				sortBy={sortBy}
+				sortDirection={sortDirection}
+				onSortByChange={setSortBy}
+				onSortDirectionChange={setSortDirection}
+			/>
+
+			<FilterInput
+				filterTerm={filterTerm}
+				onFilterChange={handleFilterChange}
+			/>
 
 			<TodoForm onAddTodo={addTodo} />
 
