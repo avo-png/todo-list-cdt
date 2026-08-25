@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import TodoForm from "./TodoForm";
 import TodoList from "./TodoList/TodoList";
 import SortBy from "../../shared/SortBy";
@@ -16,6 +16,12 @@ function TodosPage({ token }) {
 	const handleFilterChange = (newTerm) => {
 		setFilterTerm(newTerm);
 	};
+	const [dataVersion, setDataVersion] = useState(0);
+
+	const invalidateCache = useCallback(() => {
+		console.log("Invalidating memo cache after todo mutation");
+		setDataVersion((prev) => prev + 1);
+	}, []);
 
 	useEffect(() => {
 		async function fetchTodos() {
@@ -92,11 +98,15 @@ function TodosPage({ token }) {
 				throw new Error("Unable to add todo.");
 			}
 
+			invalidateCache();
+
 			const savedTodo = await response.json();
 
 			setTodoList((previous) =>
 				previous.map((todo) => (todo.id === newTodo.id ? savedTodo : todo)),
 			);
+
+			invalidateCache();
 		} catch (error) {
 			setTodoList((previous) =>
 				previous.filter((todo) => todo.id !== newTodo.id),
