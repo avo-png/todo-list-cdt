@@ -38,6 +38,7 @@ export const initialTodoState = {
 };
 
 export function todoReducer(state, action) {
+	console.log("Dispatched action:", action.type, action.payload); // Remove this before committing
 	switch (action.type) {
 		case TODO_ACTIONS.FETCH_START:
 			return {

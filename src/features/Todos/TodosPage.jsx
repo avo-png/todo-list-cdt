@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useReducer } from "react";
+import { useAuth } from "../../context/AuthContext";
 import TodoForm from "./TodoForm";
 import TodoList from "./TodoList/TodoList";
 import SortBy from "../../shared/SortBy";
@@ -10,7 +11,8 @@ import {
 	todoReducer,
 } from "../../reducers/todoReducer";
 
-function TodosPage({ token }) {
+function TodosPage() {
+	const { token } = useAuth();
 	const [state, dispatch] = useReducer(todoReducer, initialTodoState);
 
 	const {
@@ -24,14 +26,6 @@ function TodosPage({ token }) {
 		filterError,
 	} = state;
 
-	// const [todoList, setTodoList] = useState([]);
-	// const [error, setError] = useState("");
-	// const [sortBy, setSortBy] = useState("createdAt");
-	// const [sortDirection, setSortDirection] = useState("desc");
-	// const [isTodoListLoading, setIsTodoListLoading] = useState(false);
-	// const [filterTerm, setFilterTerm] = useState("");
-	// const [dataVersion, setDataVersion] = useState(0);
-	// const [filterError, setFilterError] = useState("");
 	const debouncedFilterTerm = useDebounce(filterTerm, 300);
 	const handleFilterChange = (newTerm) => {
 		dispatch({
@@ -40,18 +34,8 @@ function TodosPage({ token }) {
 		});
 	};
 
-	// const invalidateCache = useCallback(() => {
-	// 	console.log("Invalidating memo cache after todo mutation");
-	// 	dispatch({
-	// 		type: TODO_ACTIONS.INVALIDATE_CACHE,
-	// 	});
-	// }, []);
-
 	useEffect(() => {
 		async function fetchTodos() {
-			// setIsTodoListLoading(true);
-			// setError("");
-			// setFilterError("");
 			dispatch({ type: TODO_ACTIONS.FETCH_START });
 
 			try {
@@ -83,9 +67,6 @@ function TodosPage({ token }) {
 					throw new Error("Unable to fetch todos.");
 				}
 
-				// const data = await response.json();
-				// setTodoList(data);
-
 				const data = await response.json();
 
 				dispatch({
@@ -103,9 +84,6 @@ function TodosPage({ token }) {
 					},
 				});
 			}
-			// finally {
-			// 	setIsTodoListLoading(false);
-			// }
 		}
 
 		if (token) {
