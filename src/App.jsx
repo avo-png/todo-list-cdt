@@ -2,7 +2,7 @@ import "./App.css";
 import TodosPage from "./features/Todos/TodosPage";
 import Header from "./shared/Header";
 import Logon from "./features/Logon";
-import { useAuth } from "./context/AuthContext";
+import { useAuth } from "./contexts/AuthContexts";
 
 function App() {
 	const { isAuthenticated } = useAuth();
