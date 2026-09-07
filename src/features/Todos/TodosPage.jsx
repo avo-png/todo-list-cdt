@@ -1,33 +1,42 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useReducer } from "react";
+import { useAuth } from "../../contexts/AuthContexts";
 import TodoForm from "./TodoForm";
 import TodoList from "./TodoList/TodoList";
 import SortBy from "../../shared/SortBy";
 import useDebounce from "../../utils/useDebounce";
 import FilterInput from "../../shared/FilterInput";
+import {
+	initialTodoState,
+	TODO_ACTIONS,
+	todoReducer,
+} from "../../reducers/todoReducer";
 
-function TodosPage({ token }) {
-	const [todoList, setTodoList] = useState([]);
-	const [error, setError] = useState("");
-	const [sortBy, setSortBy] = useState("createdAt");
-	const [sortDirection, setSortDirection] = useState("desc");
-	const [isTodoListLoading, setIsTodoListLoading] = useState(false);
-	const [filterTerm, setFilterTerm] = useState("");
+function TodosPage() {
+	const { token } = useAuth();
+	const [state, dispatch] = useReducer(todoReducer, initialTodoState);
+
+	const {
+		todoList,
+		error,
+		sortBy,
+		sortDirection,
+		isTodoListLoading,
+		filterTerm,
+		dataVersion,
+		filterError,
+	} = state;
+
 	const debouncedFilterTerm = useDebounce(filterTerm, 300);
 	const handleFilterChange = (newTerm) => {
-		setFilterTerm(newTerm);
+		dispatch({
+			type: TODO_ACTIONS.SET_FILTER,
+			payload: newTerm,
+		});
 	};
-	const [dataVersion, setDataVersion] = useState(0);
-
-	const invalidateCache = useCallback(() => {
-		console.log("Invalidating memo cache after todo mutation");
-		setDataVersion((prev) => prev + 1);
-	}, []);
-	const [filterError, setFilterError] = useState("");
 
 	useEffect(() => {
 		async function fetchTodos() {
-			setIsTodoListLoading(true);
-			setError("");
+			dispatch({ type: TODO_ACTIONS.FETCH_START });
 
 			try {
 				const paramsObject = {
@@ -59,21 +68,21 @@ function TodosPage({ token }) {
 				}
 
 				const data = await response.json();
-				setTodoList(data);
 
-				setFilterError("");
+				dispatch({
+					type: TODO_ACTIONS.FETCH_SUCCESS,
+					payload: {
+						todos: data,
+					},
+				});
 			} catch (error) {
-				if (
-					debouncedFilterTerm ||
-					sortBy !== "createdAt" ||
-					sortDirection !== "desc"
-				) {
-					setFilterError(`Error filtering/sorting todos: ${error.message}`);
-				} else {
-					setError(`Error fetching todos: ${error.message}`);
-				}
-			} finally {
-				setIsTodoListLoading(false);
+				dispatch({
+					type: TODO_ACTIONS.FETCH_ERROR,
+					payload: {
+						message: `Error fetching todos: ${error.message}`,
+						isFilterError: false,
+					},
+				});
 			}
 		}
 
@@ -156,7 +165,15 @@ function TodosPage({ token }) {
 			{error && (
 				<div>
 					<p>{error}</p>
-					<button onClick={() => setError("")}>Clear Error</button>
+					<button
+						onClick={() =>
+							dispatch({
+								type: TODO_ACTIONS.CLEAR_ERROR,
+							})
+						}
+					>
+						Clear Error
+					</button>
 				</div>
 			)}
 
@@ -164,15 +181,22 @@ function TodosPage({ token }) {
 				<div>
 					<p>{filterError}</p>
 
-					<button onClick={() => setFilterError("")}>Clear Filter Error</button>
+					<button
+						onClick={() =>
+							dispatch({
+								type: TODO_ACTIONS.CLEAR_FILTER_ERROR,
+							})
+						}
+					>
+						Clear Filter Error
+					</button>
 
 					<button
-						onClick={() => {
-							setFilterTerm("");
-							setSortBy("createdAt");
-							setSortDirection("desc");
-							setFilterError("");
-						}}
+						onClick={() =>
+							dispatch({
+								type: TODO_ACTIONS.RESET_FILTERS,
+							})
+						}
 					>
 						Reset Filters
 					</button>
@@ -184,8 +208,24 @@ function TodosPage({ token }) {
 			<SortBy
 				sortBy={sortBy}
 				sortDirection={sortDirection}
-				onSortByChange={setSortBy}
-				onSortDirectionChange={setSortDirection}
+				onSortByChange={(newSortBy) =>
+					dispatch({
+						type: TODO_ACTIONS.SET_SORT,
+						payload: {
+							sortBy: newSortBy,
+							sortDirection,
+						},
+					})
+				}
+				onSortDirectionChange={(newSortDirection) =>
+					dispatch({
+						type: TODO_ACTIONS.SET_SORT,
+						payload: {
+							sortBy,
+							sortDirection: newSortDirection,
+						},
+					})
+				}
 			/>
 
 			<FilterInput

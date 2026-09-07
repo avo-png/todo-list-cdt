@@ -1,4 +1,8 @@
+import { useAuth } from "../contexts/AuthContexts";
+
 function Header() {
+	const { isAuthenticated } = useAuth();
+
 	return (
 		<>
 			<div>

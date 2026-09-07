@@ -1,6 +1,9 @@
 import { useState } from "react";
+import { useAuth } from "../contexts/AuthContexts";
 
-function Logon({ onSetEmail = () => {}, onSetToken = () => {} }) {
+function Logon() {
+	const { login } = useAuth();
+
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [authError, setAuthError] = useState("");
@@ -25,8 +28,7 @@ function Logon({ onSetEmail = () => {}, onSetToken = () => {} }) {
 			const data = await response.json();
 
 			if (response.status === 200 && data.name && data.csrfToken) {
-				onSetEmail(email);
-				onSetToken(data.csrfToken);
+				await login(email, password);
 			} else {
 				setAuthError(data.message || "Unable to log in.");
 			}
