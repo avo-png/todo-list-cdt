@@ -85,7 +85,7 @@ function TodosPage() {
 				const isFilterError =
 					debouncedFilterTerm ||
 					sortBy !== "createdAt" ||
-					sortDirection !== "desc";
+					sortDirection !== "asc";
 
 				dispatch({
 					type: TODO_ACTIONS.FETCH_ERROR,
@@ -100,7 +100,7 @@ function TodosPage() {
 		if (token) {
 			fetchTodos();
 		}
-	}, [token, sortBy, sortDirection, debouncedFilterTerm]);
+	}, [token, sortBy, sortDirection, debouncedFilterTerm, dataVersion]);
 
 	async function addTodo(todoTitle) {
 		const newTodo = {
@@ -212,14 +212,11 @@ function TodosPage() {
 	async function updateTodo(editedTodo) {
 		const previousTodo = todoList.find((todo) => todo.id === editedTodo.id);
 
-		if (!previousTodo) {
-			return;
-		}
-
 		dispatch({
 			type: TODO_ACTIONS.UPDATE_TODO_START,
 			payload: {
 				todo: editedTodo,
+				previousTodo,
 			},
 		});
 
