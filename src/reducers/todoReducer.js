@@ -38,7 +38,7 @@ export const initialTodoState = {
 	filterError: "",
 	isTodoListLoading: true,
 	sortBy: "createdAt",
-	sortDirection: "desc",
+	sortDirection: "asc",
 	filterTerm: "",
 	dataVersion: 0,
 };
@@ -75,10 +75,6 @@ export function todoReducer(state, action) {
 					? action.payload.message
 					: state.filterError,
 			};
-
-		// -------------------------
-		// ADD TODO
-		// -------------------------
 
 		case TODO_ACTIONS.ADD_TODO_START:
 			return {
@@ -161,26 +157,28 @@ export function todoReducer(state, action) {
 			return {
 				...state,
 				todoList: state.todoList.map((todo) =>
-					todo.id === action.payload.todo.id ? action.payload.todo : todo,
+					todo.id === action.payload.previousTodo.id
+						? action.payload.previousTodo
+						: todo,
 				),
 				error: action.payload.message,
 			};
-
-		// -------------------------
-		// SORT / FILTER
-		// -------------------------
 
 		case TODO_ACTIONS.SET_SORT:
 			return {
 				...state,
 				sortBy: action.payload.sortBy,
 				sortDirection: action.payload.sortDirection,
+				error: "",
+				filterError: "",
 			};
 
 		case TODO_ACTIONS.SET_FILTER:
 			return {
 				...state,
 				filterTerm: action.payload,
+				error: "",
+				filterError: "",
 			};
 
 		// -------------------------
@@ -208,7 +206,7 @@ export function todoReducer(state, action) {
 				...state,
 				filterTerm: "",
 				sortBy: "createdAt",
-				sortDirection: "desc",
+				sortDirection: "asc",
 				filterError: "",
 			};
 

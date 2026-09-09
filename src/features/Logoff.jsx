@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../contexts/AuthContexts";
 
 function Logoff() {
 	const { logout } = useAuth();
