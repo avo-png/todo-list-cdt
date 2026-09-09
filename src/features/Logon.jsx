@@ -11,29 +11,17 @@ function Logon() {
 
 	async function handleSubmit(event) {
 		event.preventDefault();
-
-		setIsLoggingOn(true);
 		setAuthError("");
+		setIsLoggingOn(true);
 
 		try {
-			const response = await fetch("/api/users/logon", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				credentials: "include",
-				body: JSON.stringify({ email, password }),
-			});
+			const result = await login(email, password);
 
-			const data = await response.json();
-
-			if (response.status === 200 && data.name && data.csrfToken) {
-				await login(email, password);
-			} else {
-				setAuthError(data.message || "Unable to log in.");
+			if (!result.success) {
+				setAuthError(result.error);
 			}
 		} catch (error) {
-			setAuthError("Something went wrong. Please try again.");
+			setAuthError("Unable to log in.");
 		} finally {
 			setIsLoggingOn(false);
 		}

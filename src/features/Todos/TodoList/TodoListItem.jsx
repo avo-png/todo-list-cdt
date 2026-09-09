@@ -1,11 +1,9 @@
-import { useState } from "react";
+// import { useState } from "react";
 import TextInputWithLabel from "../../../shared/TextInputWithLabel";
 import { isValidTodoTitle } from "../../../utils/todoValidation";
 import { useEditableTitle } from "../../../hooks/useEditableTitle";
 
 function TodoListItem({ todo, onCompleteTodo, onUpdateTodo }) {
-	// const [isEditing, setIsEditing] = useState(false);
-	// const [workingTitle, setWorkingTitle] = useState(todo.title);
 	const {
 		isEditing,
 		workingTitle,
@@ -16,11 +14,13 @@ function TodoListItem({ todo, onCompleteTodo, onUpdateTodo }) {
 	} = useEditableTitle(todo.title);
 
 	const handleCancel = () => {
-		setWorkingTitle(todo.title);
-		setIsEditing(false);
+		// setWorkingTitle(todo.title);
+		// setIsEditing(false);
+		cancelEdit();
 	};
 	const handleEdit = (event) => {
-		setWorkingTitle(event.target.value);
+		// setWorkingTitle(event.target.value);
+		updateTitle(event.target.value);
 	};
 	const handleUpdate = (event) => {
 		if (!isEditing) {
@@ -37,7 +37,8 @@ function TodoListItem({ todo, onCompleteTodo, onUpdateTodo }) {
 			title: workingTitle,
 		});
 
-		setIsEditing(false);
+		// setIsEditing(false);
+		finishEdit();
 	};
 	return (
 		<>
@@ -70,7 +71,7 @@ function TodoListItem({ todo, onCompleteTodo, onUpdateTodo }) {
 						checked={todo.isCompleted}
 						onChange={() => onCompleteTodo(todo.id)}
 					/>
-					<span onClick={() => setIsEditing(true)}>{todo.title}</span>
+					<span onClick={startEditing}>{todo.title}</span>
 				</>
 			)}
 		</>
